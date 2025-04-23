@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Veneno de Serpiente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos adicionales si son necesarios */
+        body {
+            font-family: 'Inter', sans-serif; /* Fuente Inter */
+        }
+        /* Estilo para resaltar la respuesta correcta */
+        .correct-answer {
+            background-color: #a7f3d0 !important; /* Verde claro */
+            border-color: #059669 !important; /* Verde oscuro */
+        }
+        /* Estilo para resaltar la respuesta incorrecta */
+        .incorrect-answer {
+            background-color: #fecaca !important; /* Rojo claro */
+            border-color: #dc2626 !important; /* Rojo oscuro */
+        }
+        /* Estilo base de los botones de opción */
+        .option-button {
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-green-100 via-teal-100 to-blue-100 min-h-screen flex items-center justify-center p-4">
+
+    <div id="quiz-container" class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-2xl">
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">Quiz: Veneno de Serpiente</h1>
+
+        <div id="question-area" class="mb-6">
+            <p id="question-number" class="text-sm text-gray-500 mb-2"></p>
+            <p id="question-text" class="text-lg font-medium text-gray-700"></p>
+        </div>
+
+        <div id="options-area" class="grid grid-cols-1 gap-4 mb-6">
+            </div>
+
+        <div id="feedback-area" class="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50 hidden">
+             <p id="feedback-text" class="text-base font-semibold mb-2"></p>
+             <p id="justification-text" class="text-sm text-gray-600"></p>
+        </div>
+
+        <div class="text-center">
+            <button id="next-button" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                Siguiente
+            </button>
+        </div>
+
+        <div id="results-area" class="text-center hidden mt-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">¡Quiz Completado!</h2>
+            <p id="score-text" class="text-xl text-gray-700 mb-6"></p>
+            <button id="restart-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-300 ease-in-out">
+                Volver a Empezar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Datos del Quiz ---
+        const quizData = [
+            {
+                question: "¿Cuáles son algunos de los componentes proteicos más frecuentes encontrados en el veneno de serpiente?",
+                options: {
+                    A: "Neurotoxinas, Citocinas y Colagenasas.",
+                    B: "Fosfolipasa A2, Metaloproteasas y Serina proteasas.",
+                    C: "Anticuerpos, Lisozimas y Péptidos."
+                },
+                correctAnswer: "B",
+                justification: "Las fuentes indican que el veneno de serpiente es una mezcla compleja que incluye componentes enzimáticos y no enzimáticos como la fosfolipasa A2, metaloproteasas, serina proteasas, lectinas, neurotoxinas, entre otros. En varios estudios analizados, la fosfolipasa A2 se identifica en nueve de cada diez estudios, mientras que las metaloproteasas aparecen en ocho. Las serina proteasas también son registradas y fueron encontradas en 4 de los estudios. Otros componentes como citocinas, colagenasas, anticuerpos, lisozimas o péptidos genéricos no se mencionan como componentes primarios del veneno en las fuentes."
+            },
+            {
+                question: "¿Cuál de las siguientes familias de proteínas del veneno de serpiente, según las fuentes, es principalmente responsable de la actividad hemorrágica y el daño tisular?",
+                options: {
+                    A: "Neurotoxinas",
+                    B: "Desintegrinas",
+                    C: "Metaloproteasas (SVMPs)"
+                },
+                correctAnswer: "C",
+                justification: "Las fuentes describen las Metaloproteasas (SVMPs) como enzimas dependientes de zinc que son componentes principales en muchos venenos, particularmente en los de víboras (Viperidae). Se afirma explícitamente que las SVMPs son principalmente responsables de la actividad hemorrágica y el daño tisular. Las neurotoxinas son principalmente responsables del bloqueo neuromuscular, mientras que las desintegrinas inhiben la agregación plaquetaria."
+            },
+            {
+                question: "De acuerdo con las fuentes, ¿qué tipo de veneno de serpiente se caracteriza por una mayor prevalencia de neurotoxinas?",
+                options: {
+                    A: "Venenos vipéridos",
+                    B: "Venenos elápidos",
+                    C: "Venenos de serpientes marinas"
+                },
+                correctAnswer: "B",
+                justification: "Las fuentes señalan diferencias claras entre los venenos de distintos tipos de serpientes. Indican que los venenos elápidos, caracterizados por neurotoxinas, se distinguen de los venenos vipéridos, en los que predominan las enzimas degradantes tisulares. Se menciona que las neurotoxinas son particularmente prominentes en los venenos de Elapidae, poniendo como ejemplo los venenos de especies de Micrurus, que causaron bloqueo neuromuscular."
+            },
+            {
+                question: "Además de los efectos hemotóxicos y neurotóxicos, ¿qué otra actividad biológica se menciona comúnmente que tienen los venenos de serpiente en las fuentes?",
+                options: {
+                    A: "Inducción de crecimiento capilar",
+                    B: "Formación de edema",
+                    C: "Regeneración ósea"
+                },
+                correctAnswer: "B",
+                justification: "Las fuentes listan varias actividades biológicas de los venenos estudiados. Junto a los efectos hemotóxicos y neurotóxicos, se menciona la formación de edema como una característica común en muchos venenos. Por ejemplo, se reportó una Dosis Edematogénica Mínima (MED) para el veneno de Bothrops roedingeri y se enfocaron en componentes edematogénicos del veneno de Agkistrodon bilineatus. Otras actividades incluyen myotoxicidad, actividades enzimáticas, respuesta inflamatoria, efectos anticoagulantes y citotoxicidad. La inducción de crecimiento capilar o la regeneración ósea no se mencionan."
+            },
+            {
+                question: "¿Cuál fue el componente más frecuentemente identificado en los venenos de las distintas especies de serpientes estudiadas según el resumen de hallazgos?",
+                options: {
+                    A: "Serina proteasas",
+                    B: "Metaloproteasas",
+                    C: "Fosfolipasa A2"
+                },
+                correctAnswer: "C",
+                justification: "De acuerdo con el resumen de los hallazgos sobre los componentes primarios del veneno en los estudios analizados, la Fosfolipasa A2 (PLA2) fue el componente más frecuentemente identificado, apareciendo en 9 de los 10 estudios. Las Metaloproteasas fueron el segundo componente más común, encontradas en 8 estudios, y las Serina proteasas se hallaron en 4 estudios."
+            },
+             {
+                question: "¿Cuál es el rango típico de peso molecular reportado para las Metaloproteasas (SVMPs) en el veneno de serpiente según las fuentes?",
+                options: {
+                    A: "6 a 14 kDa",
+                    B: "11 a 15 kDa",
+                    C: "20 a 70 kDa"
+                },
+                correctAnswer: "C",
+                justification: "Las fuentes proporcionan rangos de peso molecular para varios componentes del veneno. Específicamente, se reporta que las Metaloproteasas (SVMPs) tienen un peso molecular en el rango de 20 a 70 kDa. El rango de 6 a 14 kDa corresponde a las neurotoxinas, y el de 11 a 15 kDa corresponde a la fosfolipasa A2."
+            },
+            {
+                question: "¿Qué familia de componentes no enzimáticos del veneno de serpiente es conocida por afectar la función plaquetaria, incluyendo la inducción o inhibición de la agregación?",
+                options: {
+                    A: "CRISP",
+                    B: "Desintegrinas",
+                    C: "Lectinas tipo C"
+                },
+                correctAnswer: "C",
+                justification: "Las fuentes describen varios componentes no enzimáticos. Las Lectinas tipo C son descritas como proteínas que se unen a carbohidratos y afectan la función plaquetaria. Se menciona que pueden inducir agregación plaquetaria o tener efectos anticoagulantes. Las Desintegrinas, por su parte, se centran específicamente en la inhibición de la agregación plaquetaria, mientras que las proteínas CRISP modulan los canales iónicos. Las Lectinas tipo C son el componente descrito con un efecto más amplio sobre la función plaquetaria que incluye tanto la agregación como la inhibición."
+            },
+            {
+                question: "¿Qué función primaria se asocia con las L-aminoácido oxidasas (LAAOs) en el veneno de serpiente según las fuentes?",
+                options: {
+                    A: "Actividad hemorrágica",
+                    B: "Inducción de apoptosis",
+                    C: "Bloqueo neuromuscular"
+                },
+                correctAnswer: "B",
+                justification: "Las fuentes describen las L-Amino Ácido Oxidasas (LAAOs) como flavoenzimas cuya función primaria incluye la inducción de apoptosis y efectos antibacterianos. La actividad hemorrágica se asocia principalmente con las metaloproteasas, y el bloqueo neuromuscular con las neurotoxinas."
+            },
+            {
+                question: "Según las fuentes, ¿cuál es el rol principal de las Disintegrinas presentes en el veneno de serpiente?",
+                options: {
+                    A: "Causar daño tisular",
+                    B: "Modular canales iónicos",
+                    C: "Inhibir la agregación plaquetaria"
+                },
+                correctAnswer: "C",
+                justification: "Las fuentes identifican a las Disintegrinas como componentes no enzimáticos que tienen un motivo RGD y cuya función principal es inhibir la agregación plaquetaria uniéndose a integrinas. Causar daño tisular es rol de metaloproteasas, y modular canales iónicos es función de las proteínas CRISP."
+            },
+            {
+                question: "Las fuentes mencionan que las proteínas ricas en cisteína (CRISP) modulan ¿qué tipo de estructuras biológicas?",
+                options: {
+                    A: "La coagulación sanguínea",
+                    B: "Canales iónicos",
+                    C: "La permeabilidad vascular"
+                },
+                correctAnswer: "B",
+                justification: "Las fuentes describen a las proteínas ricas en cisteína (CRISP) como componentes del veneno conocidos por modular canales iónicos. La coagulación sanguínea es afectada por serina proteasas y algunas lectinas, y la permeabilidad vascular por componentes como svVEGF."
+            },
+            {
+                question: "¿Cómo se describe la influencia de las Lectinas tipo C en la función plaquetaria según las fuentes?",
+                options: {
+                    A: "Principalmente induciendo la agregación plaquetaria",
+                    B: "Exclusivamente inhibiendo la agregación plaquetaria",
+                    C: "Afectando la función plaquetaria, pudiendo inducir o inhibir la agregación"
+                },
+                correctAnswer: "C",
+                justification: "Las fuentes indican que las Lectinas tipo C son proteínas que se unen a carbohidratos y afectan la función plaquetaria. Se especifica que pueden inducir agregación plaquetaria o tener efectos anticoagulantes (inhibiendo la agregación)."
+            },
+            {
+                question: "¿Cuál es el rango de peso molecular típico reportado para las neurotoxinas (de cadena corta y larga) en el veneno de serpiente según las fuentes?",
+                options: {
+                    A: "6 a 14 kDa",
+                    B: "20 a 70 kDa",
+                    C: "9 kDa"
+                },
+                correctAnswer: "A",
+                justification: "Las fuentes especifican que el peso molecular de las neurotoxinas varía, con rangos de 6 a 14 kDa, y se desglosa en 6-8 kDa para las de cadena corta y 12-14 kDa para las de cadena larga. El rango de 20 a 70 kDa corresponde a las metaloproteasas, y 9 kDa es el peso de las Disintegrinas."
+            },
+            {
+                question: "De acuerdo con las fuentes, ¿cuál es el peso molecular reportado para las Disintegrinas?",
+                options: {
+                    A: "9 kDa",
+                    B: "11 a 15 kDa",
+                    C: "6 a 14 kDa"
+                },
+                correctAnswer: "A",
+                justification: "Las fuentes reportan que las Disintegrinas tienen un peso molecular de 9 kDa. El rango de 11 a 15 kDa es para la Fosfolipasa A2 y el de 6 a 14 kDa para las neurotoxinas."
+            },
+            {
+                question: "¿Cuál es el rango de peso molecular típico reportado para la fosfolipasa A2 (PLA2) en el veneno de serpiente según las fuentes?",
+                options: {
+                    A: "20 a 70 kDa",
+                    B: "11 a 15 kDa",
+                    C: "6 a 14 kDa"
+                },
+                correctAnswer: "B",
+                justification: "Las fuentes indican que la fosfolipasa A2 (PLA2) tiene un rango de peso molecular de 11 a 15 kDa. El rango de 20 a 70 kDa es para las metaloproteasas, y el de 6 a 14 kDa para las neurotoxinas."
+            },
+            {
+                question: "¿Cuál fue el género de serpiente más estudiado en los análisis mencionados en las fuentes?",
+                options: {
+                    A: "Crotalus",
+                    B: "Bothrops",
+                    C: "Micrurus"
+                },
+                correctAnswer: "B",
+                justification: "Según el resumen de las características de los estudios incluidos, el género de serpiente más comúnmente estudiado fue Bothrops, apareciendo en 4 de los estudios. Crotalus fue estudiado en 2 estudios y Micrurus en 1 estudio."
+            },
+            {
+                question: "Según las fuentes, ¿cuál fue la técnica analítica más frecuentemente utilizada para caracterizar el veneno de serpiente en los estudios?",
+                options: {
+                    A: "RP-HPLC",
+                    B: "SDS-PAGE",
+                    C: "ELISA"
+                },
+                correctAnswer: "B",
+                justification: "Las fuentes detallan que entre los métodos de análisis encontrados, SDS-PAGE fue el método más común, utilizado en 7 de los 10 estudios. RP-HPLC fue usado en 4 estudios y ELISA en 2 estudios."
+            },
+            {
+                question: "Un componente único o raro identificado en el veneno de Bothrops erythromelas que afecta la permeabilidad vascular es:",
+                options: {
+                    A: "Péptidos potenciadores de bradiquinina (BPPs)",
+                    B: "Factor de crecimiento endotelial vascular de veneno de serpiente (svVEGF)",
+                    C: "Crotoxina"
+                },
+                correctAnswer: "B",
+                justification: "Las fuentes mencionan que algunos venenos contienen componentes únicos o raros. Específicamente, se señala la presencia del Factor de crecimiento endotelial vascular de veneno de serpiente (svVEGF) en el veneno de Bothrops erythromelas, el cual afecta la permeabilidad vascular. Los BPPs también están en este veneno pero potencian el efecto hipotensor. La crotoxina es un componente de venenos de Crotalus."
+            },
+            {
+                question: "¿Cuál de las siguientes actividades biológicas fue evidenciada en algunos venenos, según las fuentes, por un aumento en los niveles plasmáticos de creatina quinasa?",
+                options: {
+                    A: "Formación de edema",
+                    B: "Miotoxicidad",
+                    C: "Alteración de la coagulación"
+                },
+                correctAnswer: "B",
+                justification: "Las fuentes describen varias actividades biológicas además de la hemotoxicidad y neurotoxicidad. Se reporta que varios venenos mostraron efectos miotóxicos. El estudio de Nina-Cueva et al. (2020) específicamente observó miotoxicidad local en el veneno de Bothrops roedingeri, la cual fue evidenciada por un aumento en los niveles plasmáticos de creatina quinasa. La formación de edema se mide típicamente con dosis edematogénica mínima (MED), y la alteración de la coagulación implica efectos sobre la cascada de coagulación."
+            }
+        ];
+
+        // --- Elementos del DOM ---
+        const quizContainer = document.getElementById('quiz-container');
+        const questionArea = document.getElementById('question-area');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsArea = document.getElementById('options-area');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackTextEl = document.getElementById('feedback-text');
+        const justificationTextEl = document.getElementById('justification-text');
+        const nextButton = document.getElementById('next-button');
+        const resultsArea = document.getElementById('results-area');
+        const scoreTextEl = document.getElementById('score-text');
+        const restartButton = document.getElementById('restart-button');
+
+        // --- Estado del Quiz ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerSelected = false;
+
+        // --- Funciones ---
+
+        /**
+         * Muestra la pregunta actual y sus opciones.
+         */
+        function displayQuestion() {
+            answerSelected = false; // Reinicia el estado de selección de respuesta
+            const currentQuestion = quizData[currentQuestionIndex];
+
+            // Muestra el número y texto de la pregunta
+            questionNumberEl.textContent = `Pregunta ${currentQuestionIndex + 1} de ${quizData.length}`;
+            questionTextEl.textContent = currentQuestion.question;
+
+            // Limpia las opciones anteriores y la retroalimentación
+            optionsArea.innerHTML = '';
+            feedbackArea.classList.add('hidden');
+            nextButton.disabled = true; // Deshabilita el botón "Siguiente" inicialmente
+
+            // Crea y muestra los botones de opción
+            for (const key in currentQuestion.options) {
+                const button = document.createElement('button');
+                button.classList.add(
+                    'option-button', 'w-full', 'text-left', 'p-4', 'border', 'border-gray-300',
+                    'rounded-lg', 'hover:bg-gray-100', 'focus:outline-none', 'focus:ring-2',
+                    'focus:ring-offset-2', 'focus:ring-teal-500', 'transition', 'duration-150',
+                    'ease-in-out'
+                );
+                // Añade un prefijo (A., B., C.) a la opción
+                button.textContent = `${key}. ${currentQuestion.options[key]}`;
+                button.dataset.key = key; // Guarda la clave de la opción (A, B, C)
+
+                // Añade el evento de clic para verificar la respuesta
+                button.addEventListener('click', () => selectAnswer(button, key));
+                optionsArea.appendChild(button);
+            }
+
+            // Cambia el texto del botón si es la última pregunta
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextButton.textContent = 'Ver Resultados';
+            } else {
+                nextButton.textContent = 'Siguiente';
+            }
+        }
+
+        /**
+         * Maneja la selección de una respuesta.
+         * @param {HTMLButtonElement} selectedButton - El botón de opción que fue clickeado.
+         * @param {string} selectedKey - La clave (A, B, C) de la opción seleccionada.
+         */
+        function selectAnswer(selectedButton, selectedKey) {
+            if (answerSelected) return; // No hacer nada si ya se seleccionó una respuesta
+
+            answerSelected = true; // Marca que se ha seleccionado una respuesta
+            const currentQuestion = quizData[currentQuestionIndex];
+            const correctAnswerKey = currentQuestion.correctAnswer;
+
+            // Deshabilita todos los botones de opción después de seleccionar
+            const optionButtons = optionsArea.querySelectorAll('.option-button');
+            optionButtons.forEach(btn => btn.disabled = true);
+
+            // Verifica si la respuesta es correcta
+            if (selectedKey === correctAnswerKey) {
+                score++; // Incrementa la puntuación
+                selectedButton.classList.add('correct-answer'); // Resalta la respuesta correcta
+                feedbackTextEl.textContent = '¡Correcto!';
+                feedbackTextEl.className = 'text-base font-semibold mb-2 text-green-700'; // Estilo para correcto
+            } else {
+                selectedButton.classList.add('incorrect-answer'); // Resalta la respuesta incorrecta
+                feedbackTextEl.textContent = 'Incorrecto.';
+                feedbackTextEl.className = 'text-base font-semibold mb-2 text-red-700'; // Estilo para incorrecto
+
+                // Encuentra y resalta el botón de la respuesta correcta
+                const correctButton = optionsArea.querySelector(`[data-key="${correctAnswerKey}"]`);
+                if (correctButton) {
+                    correctButton.classList.add('correct-answer');
+                }
+            }
+
+            // Muestra la justificación
+            justificationTextEl.textContent = `Justificación: ${currentQuestion.justification}`;
+            feedbackArea.classList.remove('hidden'); // Muestra el área de retroalimentación
+
+            // Habilita el botón "Siguiente"
+            nextButton.disabled = false;
+        }
+
+        /**
+         * Avanza a la siguiente pregunta o muestra los resultados.
+         */
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                displayQuestion(); // Muestra la siguiente pregunta
+            } else {
+                showResults(); // Muestra los resultados finales
+            }
+        }
+
+        /**
+         * Muestra la pantalla de resultados finales.
+         */
+        function showResults() {
+            // Oculta el área de preguntas y muestra el área de resultados
+            questionArea.classList.add('hidden');
+            optionsArea.classList.add('hidden');
+            feedbackArea.classList.add('hidden');
+            nextButton.classList.add('hidden');
+            resultsArea.classList.remove('hidden');
+
+            // Muestra la puntuación final
+            scoreTextEl.textContent = `Tu puntuación final es: ${score} de ${quizData.length}`;
+        }
+
+        /**
+         * Reinicia el quiz.
+         */
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answerSelected = false;
+
+            // Oculta los resultados y muestra la primera pregunta
+            resultsArea.classList.add('hidden');
+            questionArea.classList.remove('hidden');
+            optionsArea.classList.remove('hidden');
+            nextButton.classList.remove('hidden');
+            nextButton.disabled = true; // Deshabilita hasta que se seleccione una respuesta
+
+            displayQuestion(); // Muestra la primera pregunta
+        }
+
+        // --- Event Listeners ---
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', restartQuiz);
+
+        // --- Inicialización ---
+        displayQuestion(); // Muestra la primera pregunta al cargar la página
+
+    </script>
+
+</body>
+</html>
